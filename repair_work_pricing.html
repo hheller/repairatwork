@@ -1,683 +1,399 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Repair@Work Pricing Calculator</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0284c7',
-                            600: '#0369a1',
-                            700: '#075985',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        /* CSS Print Styles for PDF Export */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #summary-print-area, #summary-print-area * {
-                visibility: visible;
-            }
-            #summary-print-area {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                background: white;
-                color: black;
-                padding: 20px;
-            }
-            .no-print {
-                display: none !important;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Repair@Work Pricing</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    .card-selected { border-color: #2563eb !important; background-color: #eff6ff !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15) !important; }
+    .tier-selected { border-color: #0284c7 !important; background-color: #f0f9ff !important; }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen pb-12">
-
-    <!-- Header & Embed Instructions -->
-    <header class="bg-white border-b border-slate-200 no-print">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-wrench text-brand-600"></i>
-                        Repair@Work Pricing
-                    </h1>
-                    <p class="text-sm text-slate-500 mt-1">Configure your corporate repair quotas and compute instant CHF quotes.</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="resetCalculator()" class="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
-                        <i class="fa-solid fa-rotate-left"></i>
-                        <span>Reset</span>
-                    </button>
-                    <button onclick="toggleEmbedInfo()" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors border border-brand-100">
-                        <i class="fa-solid fa-code"></i>
-                        <span>Embed on Website</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Embed Info Accordion -->
-            <div id="embed-info" class="hidden mt-6 p-5 bg-slate-900 text-slate-200 rounded-xl text-sm leading-relaxed border border-slate-800">
-                <h3 class="font-semibold text-white mb-2 text-base flex items-center gap-2">
-                    <i class="fa-solid fa-circle-info text-brand-500"></i> How to embed this calculator on your website
-                </h3>
-                <p class="mb-3 text-slate-300">
-                    You can easily embed this calculator into <strong>WordPress, Webflow, Wix, Squarespace</strong> or custom web applications:
-                </p>
-                <ol class="list-decimal list-inside space-y-2 text-slate-300 mb-2">
-                    <li><strong>iFrame Integration:</strong> Upload this HTML file to your web server and embed it via: <code class="bg-slate-800 px-2 py-0.5 rounded text-brand-300">&lt;iframe src="path/to/preiskalkulator.html" width="100%" height="800" frameborder="0"&gt;&lt;/iframe&gt;</code></li>
-                    <li><strong>Direct HTML/CMS Block:</strong> Copy and paste the HTML content inside a Custom HTML widget/block in your CMS.</li>
-                </ol>
-            </div>
-        </div>
+<body class="p-4 md:p-8">
+  <div class="max-w-5xl mx-auto">
+    <!-- Header -->
+    <header class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8 mb-8 text-center">
+      <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Repair@Work Pricing</h1>
+      <p class="mt-2 text-slate-600 max-w-2xl mx-auto text-sm md:text-base">
+        Calculate your customized workplace repair event service cost in Swiss Francs (CHF).
+      </p>
     </header>
 
-    <!-- Main Content Container -->
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
-            <div class="lg:col-span-7 space-y-8">
-                
-                <!-- Step 1: Choose Number of Repair Days -->
-                <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
-                    <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                        <span class="w-7 h-7 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-bold">1</span>
-                        Choose Number of Repair Days
-                    </h2>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <!-- Starter Package -->
-                        <label class="relative flex flex-col justify-between p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-brand-500 transition-all has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/40">
-                            <input type="radio" name="repair_days_pkg" value="starter" class="sr-only" checked onchange="calculateTotal()">
-                            <div>
-                                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Compact</span>
-                                <span class="text-lg font-bold text-slate-900 block mt-0.5">STARTER</span>
-                                <span class="text-xs text-slate-500 block mt-1">3 Days (30 Hours)</span>
-                            </div>
-                            <div class="mt-4 pt-3 border-t border-slate-100">
-                                <span class="text-xl font-extrabold text-brand-600">CHF 6'000.-</span>
-                            </div>
-                        </label>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Main Selection Column -->
+      <div class="lg:col-span-7 space-y-8">
+        
+        <!-- STEP 1: Choose Number of Repair Days -->
+        <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm">1</span>
+            <h2 class="text-xl font-bold text-slate-900">Choose Number of Repair Days</h2>
+          </div>
 
-                        <!-- Medium Package -->
-                        <label class="relative flex flex-col justify-between p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-brand-500 transition-all has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/40">
-                            <input type="radio" name="repair_days_pkg" value="medium" class="sr-only" onchange="calculateTotal()">
-                            <div>
-                                <span class="text-xs font-bold uppercase tracking-wider text-brand-600">Most Popular</span>
-                                <span class="text-lg font-bold text-slate-900 block mt-0.5">MEDIUM</span>
-                                <span class="text-xs text-slate-500 block mt-1">12 Days (120 Hours)</span>
-                            </div>
-                            <div class="mt-4 pt-3 border-t border-slate-100">
-                                <span class="text-xl font-extrabold text-brand-600">CHF 20'000.-</span>
-                            </div>
-                        </label>
-
-                        <!-- Pay As You Go / Flexible Package -->
-                        <label class="relative flex flex-col justify-between p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-brand-500 transition-all has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/40">
-                            <input type="radio" name="repair_days_pkg" value="payg" class="sr-only" onchange="calculateTotal()">
-                            <div>
-                                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Flexible</span>
-                                <span class="text-lg font-bold text-slate-900 block mt-0.5">FLEXIBLE PACKAGE</span>
-                                <span class="text-xs text-slate-500 block mt-1">Session-based booking</span>
-                            </div>
-                            <div class="mt-4 pt-3 border-t border-slate-100">
-                                <span class="text-xs text-slate-500 block">Starting from</span>
-                                <span class="text-lg font-extrabold text-brand-600">CHF 1'500.- <span class="text-xs font-normal text-slate-500">/day</span></span>
-                            </div>
-                        </label>
-                    </div>
-
-                    <!-- Flexible Package Detailed Options Container -->
-                    <div id="payg-options-container" class="mt-5 p-5 bg-slate-50 rounded-xl border border-slate-200 hidden space-y-4">
-                        <!-- Explanation Banner -->
-                        <div class="p-3.5 bg-blue-50 border border-blue-100 rounded-lg text-xs text-blue-900 flex gap-2.5 items-start">
-                            <i class="fa-solid fa-circle-info text-blue-600 text-sm mt-0.5 shrink-0"></i>
-                            <div>
-                                <strong class="font-semibold block mb-0.5">How the Flexible Package works:</strong>
-                                With the flexible package, you pay by Repair session. We schedule a session, whenever enough items are registered. The more repair days per session, the lower the price.
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Select Session Duration:</label>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <!-- Option 1: 1-Day Sessions -->
-                                <label class="flex items-start p-3 bg-white border border-slate-200 rounded-lg cursor-pointer hover:border-brand-400 transition-all has-[:checked]:border-brand-600 has-[:checked]:ring-1 has-[:checked]:ring-brand-600">
-                                    <input type="radio" name="flex_session_type" value="1" class="mt-1 text-brand-600 focus:ring-brand-500" checked onchange="calculateTotal()">
-                                    <div class="ml-3">
-                                        <div class="flex items-center justify-between gap-2">
-                                            <span class="text-sm font-bold text-slate-900">1-Day Sessions</span>
-                                            <span class="text-xs font-bold text-brand-600">CHF 2'200 / day</span>
-                                        </div>
-                                        <p class="text-xs text-slate-500 mt-1">Suitable for small-medium size business</p>
-                                    </div>
-                                </label>
-
-                                <!-- Option 2: 2-Day Sessions -->
-                                <label class="flex items-start p-3 bg-white border border-slate-200 rounded-lg cursor-pointer hover:border-brand-400 transition-all has-[:checked]:border-brand-600 has-[:checked]:ring-1 has-[:checked]:ring-brand-600">
-                                    <input type="radio" name="flex_session_type" value="2" class="mt-1 text-brand-600 focus:ring-brand-500" onchange="calculateTotal()">
-                                    <div class="ml-3">
-                                        <div class="flex items-center justify-between gap-2">
-                                            <span class="text-sm font-bold text-slate-900">2-Day Sessions</span>
-                                            <span class="text-xs font-bold text-brand-600">CHF 2'100 / day</span>
-                                        </div>
-                                        <p class="text-xs text-slate-500 mt-1">Suitable for small-medium size business</p>
-                                    </div>
-                                </label>
-
-                                <!-- Option 3: 3-Day Sessions -->
-                                <label class="flex items-start p-3 bg-white border border-slate-200 rounded-lg cursor-pointer hover:border-brand-400 transition-all has-[:checked]:border-brand-600 has-[:checked]:ring-1 has-[:checked]:ring-brand-600">
-                                    <input type="radio" name="flex_session_type" value="3" class="mt-1 text-brand-600 focus:ring-brand-500" onchange="calculateTotal()">
-                                    <div class="ml-3">
-                                        <div class="flex items-center justify-between gap-2">
-                                            <span class="text-sm font-bold text-slate-900">3-Day Sessions</span>
-                                            <span class="text-xs font-bold text-brand-600">CHF 2'000 / day</span>
-                                        </div>
-                                        <p class="text-xs text-slate-500 mt-1">Suitable for medium size business</p>
-                                    </div>
-                                </label>
-
-                                <!-- Option 4: Week-long Sessions -->
-                                <label class="flex items-start p-3 bg-white border border-slate-200 rounded-lg cursor-pointer hover:border-brand-400 transition-all has-[:checked]:border-brand-600 has-[:checked]:ring-1 has-[:checked]:ring-brand-600">
-                                    <input type="radio" name="flex_session_type" value="5" class="mt-1 text-brand-600 focus:ring-brand-500" onchange="calculateTotal()">
-                                    <div class="ml-3">
-                                        <div class="flex items-center justify-between gap-2">
-                                            <span class="text-sm font-bold text-slate-900">Week-long (5 Days)</span>
-                                            <span class="text-xs font-bold text-brand-600">CHF 1'500 / day</span>
-                                        </div>
-                                        <p class="text-xs text-slate-500 mt-1">Suitable for larger businesses</p>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Single Session Capacity Indicator -->
-                        <div class="pt-3 border-t border-slate-200">
-                            <div class="p-3 bg-white rounded-lg border border-slate-200/80 text-xs text-slate-600 flex justify-between items-center">
-                                <div>
-                                    <span class="block text-slate-500 font-medium">Expected employees served per session:</span>
-                                    <span class="text-slate-400 text-[11px]">(Calculated from repair duration & chosen benefit quota)</span>
-                                </div>
-                                <div class="text-right">
-                                    <strong id="single-session-max-cap" class="text-brand-600 text-sm font-bold">10 Employees</strong>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Step 2: Choose Employee Benefit -->
-                <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
-                    <h2 class="text-lg font-semibold text-slate-900 mb-1 flex items-center gap-2">
-                        <span class="w-7 h-7 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-bold">2</span>
-                        Choose Employee Benefit
-                    </h2>
-
-                    <!-- Explanatory Text Below Heading -->
-                    <p class="text-xs text-slate-500 leading-relaxed mb-4 ml-9">
-                        While your employees cover the costs of spare parts and extra time, you offer them one of the following packages. Your employees register the item, including their price limit for additional repair costs (they are charged with the additional time and parts necessary for repair). After drop off, the item is analyzed. Depending on the item's cost limit and the available benefit to the owner, items are either directly repaired or a quote is sent to the owner.
-                    </p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <!-- SMALL Option -->
-                        <label class="relative flex flex-col justify-between p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-brand-500 transition-all has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/40">
-                            <input type="radio" name="employee_benefit" value="20" class="sr-only" onchange="calculateTotal()">
-                            <div>
-                                <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-100">
-                                    <span class="text-base font-bold text-slate-900 flex items-center gap-1.5">SMALL ⏱️</span>
-                                    <span class="text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded">20 mins</span>
-                                </div>
-                                <ul class="space-y-1 text-xs text-slate-700 font-medium">
-                                    <li class="text-slate-500 font-semibold mb-1">20 mins Repair Time — enables:</li>
-                                    <li class="flex items-center gap-1.5"><span>🔎</span> <span>Analysis</span></li>
-                                    <li class="flex items-center gap-1.5"><span>🔧</span> <span>Some quick fixes</span></li>
-                                </ul>
-                            </div>
-                        </label>
-
-                        <!-- NORMAL Option -->
-                        <label class="relative flex flex-col justify-between p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-brand-500 transition-all has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/40">
-                            <input type="radio" name="employee_benefit" value="60" class="sr-only" checked onchange="calculateTotal()">
-                            <div>
-                                <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-100">
-                                    <span class="text-base font-bold text-slate-900 flex items-center gap-1.5">NORMAL ⏱️⏱️</span>
-                                    <span class="text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded">60 mins</span>
-                                </div>
-                                <ul class="space-y-1 text-xs text-slate-700 font-medium">
-                                    <li class="text-slate-500 font-semibold mb-1">60 mins Repair Time</li>
-                                    <li class="flex items-center gap-1.5"><span>🔎</span> <span>Analysis</span></li>
-                                    <li class="flex items-center gap-1.5"><span>🛠️</span> <span>Repair of many items</span></li>
-                                </ul>
-                            </div>
-                        </label>
-
-                        <!-- LARGE Option -->
-                        <label class="relative flex flex-col justify-between p-4 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-brand-500 transition-all has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50/40">
-                            <input type="radio" name="employee_benefit" value="120" class="sr-only" onchange="calculateTotal()">
-                            <div>
-                                <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-100">
-                                    <span class="text-base font-bold text-slate-900 flex items-center gap-1.5">LARGE ⏱️⏱️️⏱️⏱️</span>
-                                    <span class="text-xs font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded">120 mins</span>
-                                </div>
-                                <ul class="space-y-1 text-xs text-slate-700 font-medium">
-                                    <li class="text-slate-500 font-semibold mb-1">120 mins Repair Time</li>
-                                    <li class="flex items-center gap-1.5"><span>🔎</span> <span>Analysis</span></li>
-                                    <li class="flex items-center gap-1.5"><span>✅</span> <span>Repair of most items</span></li>
-                                    <li class="flex items-start gap-1.5 text-[11px] text-slate-500 mt-1 italic">
-                                        <span>⚙️</span> <span>Replacement parts may be exchanged for time (1 min = CHF 2.50)</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </label>
-                    </div>
-                </section>
-
-                <!-- Step 3: Expected # of Employees Served (HIDDEN WHEN FLEXIBLE PACKAGE IS SELECTED) -->
-                <section id="step-3-section" class="bg-gradient-to-br from-brand-50 to-slate-50 rounded-2xl p-6 shadow-sm border border-brand-100">
-                    <div class="flex items-center justify-between mb-3">
-                        <h2 class="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                            <span class="w-7 h-7 rounded-full bg-brand-600 text-white flex items-center justify-center text-sm font-bold">3</span>
-                            Expected # of Employees Served
-                        </h2>
-                        <span class="text-xs bg-brand-100 text-brand-700 font-bold px-2.5 py-1 rounded-md">Automatic Calculation</span>
-                    </div>
-
-                    <div class="mt-4 p-5 bg-white rounded-xl border border-brand-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div>
-                            <span class="text-xs font-medium text-slate-500 uppercase tracking-wider block">Estimated Service Quota</span>
-                            <div class="flex items-baseline gap-2 mt-1">
-                                <span id="calc-employees-count" class="text-3xl font-extrabold text-brand-600">30</span>
-                                <span class="text-base font-bold text-slate-700">Employees Served</span>
-                            </div>
-                        </div>
-                        
-                        <div class="text-right sm:text-right border-t sm:border-t-0 border-slate-100 pt-3 sm:pt-0 w-full sm:w-auto">
-                            <span id="calc-total-hours" class="text-sm font-bold text-slate-800 block">30 Hours Capacity</span>
-                            <span class="text-xs text-slate-400">1 Day = 10 Hours (600 Mins)</span>
-                        </div>
-                    </div>
-
-                    <div class="mt-3 text-xs text-slate-500 flex items-center gap-1.5 px-1">
-                        <i class="fa-solid fa-calculator text-brand-500"></i>
-                        <span id="calc-formula-display">Calculation: (3 Days × 10 Hours × 60 Mins) ÷ 60 Mins/Employee = 30 Employees</span>
-                    </div>
-                </section>
-
-                <!-- Step 4: Additional Options & Upgrades -->
-                <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80">
-                    <h2 class="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                        <span id="step-4-number" class="w-7 h-7 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-sm font-bold">4</span>
-                        Additional Options & Upgrades
-                    </h2>
-
-                    <div class="space-y-3">
-                        <label class="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors">
-                            <div class="flex items-center gap-3.5">
-                                <input type="checkbox" id="addon-social" class="w-5 h-5 text-brand-600 rounded border-slate-300 focus:ring-brand-500" onchange="calculateTotal()">
-                                <div>
-                                    <span class="text-sm font-semibold text-slate-900 block">Social Media Package for Employer Branding</span>
-                                    <p class="text-xs text-slate-500 mt-0.5">Custom video & graphic media assets showcasing your employee perks on LinkedIn & Instagram.</p>
-                                </div>
-                            </div>
-                            <span class="text-sm font-bold text-slate-800 whitespace-nowrap ml-4">+ CHF 990.-</span>
-                        </label>
-
-                        <label class="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition-colors">
-                            <div class="flex items-center gap-3.5">
-                                <input type="checkbox" id="addon-giftcard" class="w-5 h-5 text-brand-600 rounded border-slate-300 focus:ring-brand-500" onchange="calculateTotal()">
-                                <div>
-                                    <span class="text-sm font-semibold text-slate-900 block">Design of custom employee gift card</span>
-                                    <p class="text-xs text-slate-500 mt-0.5">Customized voucher design tailored to your company corporate identity (print or digital format).</p>
-                                </div>
-                            </div>
-                            <span class="text-sm font-bold text-slate-800 whitespace-nowrap ml-4">+ CHF 290.-</span>
-                        </label>
-                    </div>
-                </section>
-
-            </div>
-
-            <!-- Right Column: Summary Card & Live Calculation -->
-            <div class="lg:col-span-5">
-                <div id="summary-print-area" class="sticky top-8 bg-white rounded-2xl p-6 shadow-md border border-slate-200/80">
-                    <h2 class="text-xl font-bold text-slate-900 mb-4 pb-3 border-b border-slate-100 flex items-center justify-between">
-                        <span>Summary & Quote</span>
-                        <span class="text-xs bg-brand-50 text-brand-700 font-semibold px-2.5 py-1 rounded-md no-print">Live Calculation</span>
-                    </h2>
-
-                    <!-- Itemized Breakdown List -->
-                    <div id="summary-items" class="space-y-3 text-sm border-b border-slate-100 pb-4">
-                        <!-- Dynamic items will be injected here via JavaScript -->
-                    </div>
-
-                    <!-- Financial Calculations -->
-                    <div class="py-4 space-y-2.5 text-sm">
-                        <div class="flex justify-between text-slate-600">
-                            <span>Subtotal (Net):</span>
-                            <span id="subtotal-display" class="font-semibold text-slate-800">CHF 0.00</span>
-                        </div>
-                        <div class="flex justify-between text-slate-600">
-                            <span>Swiss VAT (8.1%):</span>
-                            <span id="vat-display" class="font-semibold text-slate-800">CHF 0.00</span>
-                        </div>
-                        <div class="pt-3 border-t border-slate-200 flex justify-between items-baseline">
-                            <span class="text-base font-bold text-slate-900">Total Amount:</span>
-                            <div class="text-right">
-                                <span id="total-display" class="text-2xl font-extrabold text-brand-600">CHF 0.00</span>
-                                <span class="block text-xs text-slate-400 mt-0.5">incl. 8.1% VAT</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="space-y-3 pt-2 no-print">
-                        <button onclick="openContactModal()" class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-paper-plane"></i>
-                            Request Formal Offer
-                        </button>
-                        
-                        <button onclick="window.print()" class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
-                            <i class="fa-solid fa-print"></i>
-                            Print / Save as PDF
-                        </button>
-                    </div>
-
-                    <p class="text-xs text-slate-400 text-center mt-4 no-print">
-                        Non-binding cost estimation. Rates subject to final contract terms.
-                    </p>
+          <div class="grid grid-cols-1 gap-4 mb-4">
+            <!-- STARTER -->
+            <div id="pkg-starter" onclick="selectPackage('starter')" class="pkg-card cursor-pointer border-2 border-slate-200 rounded-xl p-4 transition-all hover:border-blue-300">
+              <div class="flex justify-between items-start mb-1">
+                <div>
+                  <h3 class="font-bold text-slate-900 text-lg">STARTER PACKAGE</h3>
+                  <p class="text-xs text-slate-500 font-medium">Fixed 3 Days / Year</p>
                 </div>
+                <div class="text-right">
+                  <span class="text-xl font-extrabold text-blue-600">CHF 6'000.-</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-600">3 dedicated repair days included.</p>
             </div>
 
-        </div>
-    </main>
+            <!-- MEDIUM -->
+            <div id="pkg-medium" onclick="selectPackage('medium')" class="pkg-card cursor-pointer border-2 border-slate-200 rounded-xl p-4 transition-all hover:border-blue-300">
+              <div class="flex justify-between items-start mb-1">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-slate-900 text-lg">MEDIUM PACKAGE</h3>
+                    <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Popular</span>
+                  </div>
+                  <p class="text-xs text-slate-500 font-medium">Fixed 12 Days / Year</p>
+                </div>
+                <div class="text-right">
+                  <span class="text-xl font-extrabold text-blue-600">CHF 20'000.-</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-600">12 dedicated repair days included.</p>
+            </div>
 
-    <!-- Modal for Inquiry Form -->
-    <div id="contact-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200 no-print">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative transform scale-95 transition-transform duration-200" id="modal-box">
-            <button onclick="closeContactModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1">
-                <i class="fa-solid fa-xmark text-xl"></i>
+            <!-- FLEXIBLE -->
+            <div id="pkg-flexible" onclick="selectPackage('flexible')" class="pkg-card cursor-pointer border-2 border-slate-200 rounded-xl p-4 transition-all hover:border-blue-300">
+              <div class="flex justify-between items-start mb-1">
+                <div>
+                  <h3 class="font-bold text-slate-900 text-lg">PAY AS YOU GO (FLEXIBLE)</h3>
+                  <p class="text-xs text-slate-500 font-medium">Session-Based Repair Days</p>
+                </div>
+                <div class="text-right">
+                  <span class="text-sm text-slate-500 block">Starting from</span>
+                  <span class="text-xl font-extrabold text-blue-600">CHF 1'500 / day</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-600 mt-2 bg-slate-50 p-2.5 rounded-lg border border-slate-100 italic">
+                "With the flexible package, you pay by Repair session. We schedule a session whenever enough items are registered. The more repair days per session, the lower the price."
+              </p>
+
+              <!-- Flexible Sub-Options -->
+              <div id="flexible-options" class="hidden mt-4 pt-4 border-t border-slate-200 space-y-3" onclick="event.stopPropagation()">
+                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wide">Select Session Format:</label>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div id="flex-1" onclick="selectFlexTier(1, 2200)" class="flex-tier cursor-pointer p-3 border rounded-lg text-left transition-all">
+                    <div class="font-bold text-slate-900 text-sm">1-Day Session</div>
+                    <div class="text-xs text-blue-600 font-bold">CHF 2'200 / day</div>
+                    <div class="text-[11px] text-slate-500 mt-1">Suitable for small-medium size business</div>
+                  </div>
+
+                  <div id="flex-2" onclick="selectFlexTier(2, 2100)" class="flex-tier cursor-pointer p-3 border rounded-lg text-left transition-all">
+                    <div class="font-bold text-slate-900 text-sm">2-Day Sessions</div>
+                    <div class="text-xs text-blue-600 font-bold">CHF 2'100 / day</div>
+                    <div class="text-[11px] text-slate-500 mt-1">Suitable for small-medium size business</div>
+                  </div>
+
+                  <div id="flex-3" onclick="selectFlexTier(3, 2000)" class="flex-tier cursor-pointer p-3 border rounded-lg text-left transition-all">
+                    <div class="font-bold text-slate-900 text-sm">3-Day Sessions</div>
+                    <div class="text-xs text-blue-600 font-bold">CHF 2'000 / day</div>
+                    <div class="text-[11px] text-slate-500 mt-1">Suitable for medium size business</div>
+                  </div>
+
+                  <div id="flex-5" onclick="selectFlexTier(5, 1500)" class="flex-tier cursor-pointer p-3 border rounded-lg text-left transition-all">
+                    <div class="font-bold text-slate-900 text-sm">Week-Long (5 Days)</div>
+                    <div class="text-xs text-blue-600 font-bold">CHF 1'500 / day</div>
+                    <div class="text-[11px] text-slate-500 mt-1">Suitable for larger businesses</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 2: Choose Employee Benefit -->
+        <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm">2</span>
+            <h2 class="text-xl font-bold text-slate-900">Choose Employee Benefit</h2>
+          </div>
+
+          <p class="text-xs text-slate-600 mb-5 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200">
+            While your employees cover the costs of spare parts and extra time, you offer them one of the following packages.<br><br>
+            Your employees register the item, including their price limit for additional repair costs (they are charged with the additional time and parts necessary for repair). After drop off, the item is analyzed. Depending on the item's cost limit and the available benefit to the owner, items are either directly repaired or a quote is sent to the owner.
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <!-- SMALL -->
+            <div id="benefit-small" onclick="selectBenefit('small', 20)" class="benefit-card cursor-pointer border-2 border-slate-200 rounded-xl p-4 transition-all hover:border-blue-300">
+              <div class="text-lg font-bold text-slate-900 mb-1">SMALL ⏱️</div>
+              <div class="text-xs font-semibold text-blue-600 mb-2">20 mins Repair Time</div>
+              <div class="text-xs text-slate-600 space-y-1">
+                <div>🔎 Analysis</div>
+                <div>🔧 Some quick fixes</div>
+              </div>
+            </div>
+
+            <!-- NORMAL -->
+            <div id="benefit-normal" onclick="selectBenefit('normal', 60)" class="benefit-card cursor-pointer border-2 border-slate-200 rounded-xl p-4 transition-all hover:border-blue-300">
+              <div class="text-lg font-bold text-slate-900 mb-1">NORMAL ⏱️⏱️</div>
+              <div class="text-xs font-semibold text-blue-600 mb-2">60 mins Repair Time</div>
+              <div class="text-xs text-slate-600 space-y-1">
+                <div>🔎 Analysis</div>
+                <div>🛠️ Repair of many items</div>
+              </div>
+            </div>
+
+            <!-- LARGE -->
+            <div id="benefit-large" onclick="selectBenefit('large', 120)" class="benefit-card cursor-pointer border-2 border-slate-200 rounded-xl p-4 transition-all hover:border-blue-300">
+              <div class="text-lg font-bold text-slate-900 mb-1">LARGE ⏱️⏱️⏱️️⏱️</div>
+              <div class="text-xs font-semibold text-blue-600 mb-2">120 mins Repair Time</div>
+              <div class="text-xs text-slate-600 space-y-1">
+                <div>🔎 Analysis</div>
+                <div>✅ Repair of most items</div>
+                <div class="pt-1 text-[11px] text-slate-500 border-t border-slate-100">⚙️️ Replacement parts may be exchanged for time (1 min = CHF 2.50)</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP 3: Expected Capacity (Fixed plans only) -->
+        <section id="step-3-section" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-sm">3</span>
+            <h2 class="text-xl font-bold text-slate-900">Expected # of Employees Served</h2>
+          </div>
+
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 text-center">
+            <div id="capacity-value" class="text-4xl font-extrabold text-blue-700 mb-1">30</div>
+            <div class="text-sm font-semibold text-blue-900 uppercase tracking-wide">Employees Served / Year</div>
+            <p id="capacity-formula" class="text-xs text-blue-600 mt-2">
+              Based on 3 repair days (30 hours total) and 60 mins repair time per employee.
+            </p>
+          </div>
+        </section>
+
+        <!-- Additional Options & Upgrades -->
+        <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+          <h2 class="text-lg font-bold text-slate-900 mb-4">Additional Options & Upgrades</h2>
+          
+          <div class="space-y-3">
+            <label class="flex items-start gap-3 p-3.5 border rounded-xl cursor-pointer hover:bg-slate-50 transition-all">
+              <input type="checkbox" id="addon-social" onchange="calculateTotal()" class="mt-1 w-4 h-4 text-blue-600 rounded">
+              <div class="flex-1">
+                <div class="flex justify-between font-semibold text-sm text-slate-900">
+                  <span>Social Media Package for Employer Branding</span>
+                  <span class="text-blue-600">+ CHF 990.-</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5">High-quality visual content and story highlights from your repair events.</p>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-3 p-3.5 border rounded-xl cursor-pointer hover:bg-slate-50 transition-all">
+              <input type="checkbox" id="addon-giftcard" onchange="calculateTotal()" class="mt-1 w-4 h-4 text-blue-600 rounded">
+              <div class="flex-1">
+                <div class="flex justify-between font-semibold text-sm text-slate-900">
+                  <span>Design of Custom Employee Gift Card</span>
+                  <span class="text-blue-600">+ CHF 290.-</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5">Branded employee gift card design (print or digital format).</p>
+              </div>
+            </label>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Column: Summary & Pricing Box -->
+      <div class="lg:col-span-5">
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 sticky top-6">
+          <h2 class="text-xl font-bold text-slate-900 mb-4 pb-3 border-b border-slate-100">Summary & Quote</h2>
+
+          <div class="space-y-3 text-sm mb-6">
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-600">Selected Plan:</span>
+              <span id="sum-package" class="font-bold text-slate-900">STARTER</span>
+            </div>
+
+            <div class="flex justify-between py-1 border-b border-slate-100">
+              <span class="text-slate-600">Employee Benefit:</span>
+              <span id="sum-benefit" class="font-bold text-slate-900">NORMAL (60 mins)</span>
+            </div>
+
+            <!-- Single session capacity (Shown for Flexible package) -->
+            <div id="sum-flex-session-capacity-row" class="hidden flex justify-between py-1 border-b border-slate-100 bg-amber-50 px-2 rounded">
+              <span class="text-amber-900 font-medium">Approx. Served / Session:</span>
+              <span id="sum-flex-session-capacity" class="font-bold text-amber-900">10 employees</span>
+            </div>
+
+            <div id="sum-addons-list" class="space-y-1.5 pt-1"></div>
+          </div>
+
+          <!-- Price Calculation -->
+          <div class="bg-slate-50 p-4 rounded-xl space-y-2 mb-6">
+            <div class="flex justify-between text-sm text-slate-600">
+              <span>Subtotal (Net):</span>
+              <span id="price-subtotal" class="font-semibold text-slate-900">CHF 6'000.00</span>
+            </div>
+            <div class="flex justify-between text-sm text-slate-600">
+              <span>MWST / VAT (8.1%):</span>
+              <span id="price-vat" class="font-semibold text-slate-900">CHF 486.00</span>
+            </div>
+            <div class="border-t border-slate-200 pt-2 flex justify-between text-lg font-extrabold text-slate-900">
+              <span>Total Cost:</span>
+              <span id="price-grandtotal" class="text-blue-600">CHF 6'486.00</span>
+            </div>
+          </div>
+
+          <!-- Inquiry Form -->
+          <form onsubmit="handleQuoteSubmit(event)" class="space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Company Name</label>
+              <input type="text" required placeholder="Acme AG" class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Contact Email</label>
+              <input type="email" required placeholder="contact@company.ch" class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition-all">
+              Request Detailed Proposal
             </button>
-            
-            <h3 class="text-xl font-bold text-slate-900 mb-1">Request Formal Quote</h3>
-            <p class="text-xs text-slate-500 mb-6">Submit your current configuration and our team will get in touch with a customized contract.</p>
-
-            <form onsubmit="handleFormSubmit(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Company / Organization Name *</label>
-                    <input type="text" required placeholder="Acme AG" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Contact Person Name *</label>
-                    <input type="text" required placeholder="Jane Doe" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Work Email Address *</label>
-                    <input type="email" required placeholder="jane.doe@company.ch" class="w-full px-3.5 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Additional Notes or Questions</label>
-                    <textarea rows="3" placeholder="Tell us about your location or specific start dates..." class="w-full px-3.5 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
-                </div>
-
-                <!-- Custom Alert Notification Box -->
-                <div id="form-alert" class="hidden p-3 rounded-lg text-xs font-medium"></div>
-
-                <div class="pt-2 flex justify-end gap-3">
-                    <button type="button" onclick="closeContactModal()" class="px-4 py-2 text-slate-600 hover:bg-slate-100 text-sm font-medium rounded-lg">
-                        Cancel
-                    </button>
-                    <button type="submit" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg transition-colors">
-                        Submit Inquiry
-                    </button>
-                </div>
-            </form>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- JavaScript Logic -->
-    <script>
-        // Swiss Standard VAT Rate
-        const VAT_RATE = 0.081; // 8.1%
+  <script>
+    let state = {
+      package: 'starter', // starter, medium, flexible
+      flexDays: 1,
+      flexPricePerDay: 2200,
+      benefitMins: 60,
+      benefitName: 'NORMAL'
+    };
 
-        // Formatting Currency in CHF
-        function formatCHF(amount) {
-            return 'CHF ' + new Intl.NumberFormat('de-CH', { 
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }).format(amount);
-        }
+    function init() {
+      selectPackage('starter');
+      selectBenefit('normal', 60);
+    }
 
-        // Toggle Embedding Guide
-        function toggleEmbedInfo() {
-            const info = document.getElementById('embed-info');
-            info.classList.toggle('hidden');
-        }
+    function selectPackage(pkg) {
+      state.package = pkg;
+      document.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('card-selected'));
+      document.getElementById(`pkg-${pkg}`).classList.add('card-selected');
 
-        // Reset Calculator to Standard Defaults
-        function resetCalculator() {
-            document.querySelector('input[name="repair_days_pkg"][value="starter"]').checked = true;
-            document.querySelector('input[name="flex_session_type"][value="1"]').checked = true;
-            document.querySelector('input[name="employee_benefit"][value="60"]').checked = true;
-            document.getElementById('addon-social').checked = false;
-            document.getElementById('addon-giftcard').checked = false;
+      const flexOpts = document.getElementById('flexible-options');
+      const step3 = document.getElementById('step-3-section');
+      const flexCapRow = document.getElementById('sum-flex-session-capacity-row');
 
-            calculateTotal();
-        }
+      if (pkg === 'flexible') {
+        flexOpts.classList.remove('hidden');
+        step3.classList.add('hidden');
+        flexCapRow.classList.remove('hidden');
+        if (!state.flexDays) selectFlexTier(1, 2200);
+      } else {
+        flexOpts.classList.add('hidden');
+        step3.classList.remove('hidden');
+        flexCapRow.classList.add('hidden');
+      }
 
-        // Core Price & Capacity Calculation Logic
-        function calculateTotal() {
-            // 1. Employee Benefit Selection (Step 2)
-            const repairTimeMins = parseInt(document.querySelector('input[name="employee_benefit"]:checked').value);
-            
-            let benefitLabel = "NORMAL (60 mins)";
-            if (repairTimeMins === 20) benefitLabel = "SMALL (20 mins)";
-            if (repairTimeMins === 120) benefitLabel = "LARGE (120 mins)";
+      calculateTotal();
+    }
 
-            // 2. Package Selection Logic (Step 1)
-            const selectedPackage = document.querySelector('input[name="repair_days_pkg"]:checked').value;
-            const paygOptionsContainer = document.getElementById('payg-options-container');
-            const step3Section = document.getElementById('step-3-section');
-            const step4Number = document.getElementById('step-4-number');
+    function selectFlexTier(days, price) {
+      state.flexDays = days;
+      state.flexPricePerDay = price;
+      
+      document.querySelectorAll('.flex-tier').forEach(t => t.classList.remove('tier-selected'));
+      document.getElementById(`flex-${days}`).classList.add('tier-selected');
+      
+      calculateTotal();
+    }
 
-            let packagePrice = 0;
-            let packageLabel = '';
-            let totalRepairDays = 0;
-            let calculatedEmployeesServed = 0;
-            let flexSessionCapacity = 0;
+    function selectBenefit(name, mins) {
+      state.benefitMins = mins;
+      state.benefitName = name.toUpperCase();
 
-            if (selectedPackage === 'starter') {
-                paygOptionsContainer.classList.add('hidden');
-                step3Section.classList.remove('hidden');
-                step4Number.textContent = '4';
+      document.querySelectorAll('.benefit-card').forEach(c => c.classList.remove('card-selected'));
+      document.getElementById(`benefit-${name}`).classList.add('card-selected');
 
-                packagePrice = 6000;
-                totalRepairDays = 3;
-                packageLabel = 'STARTER Package (3 Days)';
-                
-                // Capacity formula: (Days * 10h * 60m) / time_per_emp
-                calculatedEmployeesServed = Math.floor((totalRepairDays * 10 * 60) / repairTimeMins);
+      calculateTotal();
+    }
 
-            } else if (selectedPackage === 'medium') {
-                paygOptionsContainer.classList.add('hidden');
-                step3Section.classList.remove('hidden');
-                step4Number.textContent = '4';
+    function formatCHF(val) {
+      return 'CHF ' + val.toLocaleString('de-CH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
 
-                packagePrice = 20000;
-                totalRepairDays = 12;
-                packageLabel = 'MEDIUM Package (12 Days)';
-                
-                // Capacity formula: (Days * 10h * 60m) / time_per_emp
-                calculatedEmployeesServed = Math.floor((totalRepairDays * 10 * 60) / repairTimeMins);
+    function calculateTotal() {
+      let subtotal = 0;
+      let days = 3;
+      let pkgTitle = '';
 
-            } else if (selectedPackage === 'payg') {
-                paygOptionsContainer.classList.remove('hidden');
-                step3Section.classList.add('hidden'); // Hide Step 3 completely for Flexible package
-                step4Number.textContent = '3';
+      if (state.package === 'starter') {
+        subtotal = 6000;
+        days = 3;
+        pkgTitle = 'STARTER (3 Days)';
+      } else if (state.package === 'medium') {
+        subtotal = 20000;
+        days = 12;
+        pkgTitle = 'MEDIUM (12 Days)';
+      } else if (state.package === 'flexible') {
+        days = state.flexDays;
+        subtotal = state.flexDays * state.flexPricePerDay;
+        pkgTitle = `PAY AS YOU GO (${state.flexDays}-Day Session)`;
+      }
 
-                // Read session duration (1, 2, 3, or 5 days)
-                const daysPerSession = parseInt(document.querySelector('input[name="flex_session_type"]:checked').value);
-                
-                // Calculate single session max capacity: (Session Days * 10 hours * 60 mins) / repairTimeMins
-                flexSessionCapacity = Math.floor((daysPerSession * 10 * 60) / repairTimeMins);
-                document.getElementById('single-session-max-cap').textContent = `${flexSessionCapacity} ${flexSessionCapacity === 1 ? 'Employee' : 'Employees'}`;
+      // Addons
+      const addSocial = document.getElementById('addon-social').checked;
+      const addGift = document.getElementById('addon-giftcard').checked;
+      const addonsList = document.getElementById('sum-addons-list');
+      addonsList.innerHTML = '';
 
-                let pricePerDay = 2200;
-                let sessionName = '1-Day Session';
+      if (addSocial) {
+        subtotal += 990;
+        addonsList.innerHTML += `<div class="flex justify-between text-xs text-slate-600"><span>+ Social Media Package</span><span>CHF 990.00</span></div>`;
+      }
+      if (addGift) {
+        subtotal += 290;
+        addonsList.innerHTML += `<div class="flex justify-between text-xs text-slate-600"><span>+ Custom Gift Card</span><span>CHF 290.00</span></div>`;
+      }
 
-                if (daysPerSession === 1) {
-                    pricePerDay = 2200;
-                    sessionName = '1-Day Session';
-                } else if (daysPerSession === 2) {
-                    pricePerDay = 2100;
-                    sessionName = '2-Day Session';
-                } else if (daysPerSession === 3) {
-                    pricePerDay = 2000;
-                    sessionName = '3-Day Session';
-                } else if (daysPerSession === 5) {
-                    pricePerDay = 1500;
-                    sessionName = 'Week-long Session (5 Days)';
-                }
+      // VAT and Grand Total
+      const vat = subtotal * 0.081;
+      const grandTotal = subtotal + vat;
 
-                totalRepairDays = daysPerSession;
-                packagePrice = daysPerSession * pricePerDay;
+      // Update Summary Info
+      document.getElementById('sum-package').textContent = pkgTitle;
+      document.getElementById('sum-benefit').textContent = `${state.benefitName} (${state.benefitMins} mins)`;
 
-                packageLabel = `FLEXIBLE PACKAGE: ${sessionName} (${daysPerSession} ${daysPerSession === 1 ? 'Day' : 'Days'} @ CHF ${pricePerDay.toLocaleString('de-CH')}.-/day)`;
-            }
+      // Capacity Calculations
+      const hoursPerDay = 10;
+      const minsPerDay = hoursPerDay * 60; // 600 mins
+      const totalCapacity = Math.floor((days * minsPerDay) / state.benefitMins);
+      const sessionCapacity = Math.floor((state.flexDays * minsPerDay) / state.benefitMins);
 
-            // 3. Step 3 Updates (Integrated Capacity for Fixed Packages)
-            if (selectedPackage !== 'payg') {
-                const totalHours = totalRepairDays * 10;
-                document.getElementById('calc-employees-count').textContent = calculatedEmployeesServed;
-                document.getElementById('calc-total-hours').textContent = `${totalHours} Hours Capacity`;
-                document.getElementById('calc-formula-display').textContent = 
-                    `Calculation: (${totalRepairDays} Day${totalRepairDays > 1 ? 's' : ''} × 10 Hours × 60 Mins) ÷ ${repairTimeMins} Mins/Employee = ${calculatedEmployeesServed} Employees`;
-            }
+      document.getElementById('capacity-value').textContent = totalCapacity;
+      document.getElementById('capacity-formula').textContent = 
+        `Based on ${days} repair day(s) (${days * 10} hours total) and ${state.benefitMins} mins repair time per employee.`;
 
-            // 4. Add-ons Calculation
-            let addonsTotal = 0;
-            const isSocialAddon = document.getElementById('addon-social').checked;
-            const isGiftCardAddon = document.getElementById('addon-giftcard').checked;
+      document.getElementById('sum-flex-session-capacity').textContent = `~${sessionCapacity} employees`;
 
-            if (isSocialAddon) {
-                addonsTotal += 990;
-            }
-            if (isGiftCardAddon) {
-                addonsTotal += 290;
-            }
+      // Update Price UI
+      document.getElementById('price-subtotal').textContent = formatCHF(subtotal);
+      document.getElementById('price-vat').textContent = formatCHF(vat);
+      document.getElementById('price-grandtotal').textContent = formatCHF(grandTotal);
+    }
 
-            // 5. Update Itemized Summary Card
-            const summaryContainer = document.getElementById('summary-items');
-            summaryContainer.innerHTML = '';
+    function handleQuoteSubmit(e) {
+      e.preventDefault();
+      alert('Thank you for your proposal request! We will contact you shortly.');
+    }
 
-            // Render Package Row
-            appendSummaryRow(summaryContainer, packageLabel, formatCHF(packagePrice));
-
-            // Render Employee Benefit Row
-            appendSummaryRow(summaryContainer, `Employee Benefit: ${benefitLabel}`, '');
-
-            // Detail / Capacity Row in Summary
-            if (selectedPackage === 'payg') {
-                const sessionDetailRow = document.createElement('div');
-                sessionDetailRow.className = 'text-xs text-slate-600 pl-2 border-l-2 border-brand-500 py-1 my-1 bg-brand-50/50 rounded-r';
-                sessionDetailRow.innerHTML = `Approx. employees served per session: <strong class="text-brand-700">${flexSessionCapacity} employees</strong> (${repairTimeMins} mins/employee limit)`;
-                summaryContainer.appendChild(sessionDetailRow);
-            } else {
-                const scopeDetailRow = document.createElement('div');
-                scopeDetailRow.className = 'text-xs text-slate-500 pl-2 border-l-2 border-brand-500 py-0.5 my-1';
-                scopeDetailRow.innerHTML = `Serves approx. <strong>${calculatedEmployeesServed} employees</strong> (${repairTimeMins} mins quota / ${totalRepairDays * 10} total repair hours)`;
-                summaryContainer.appendChild(scopeDetailRow);
-            }
-
-            // Addon Rows
-            if (isSocialAddon) {
-                appendSummaryRow(summaryContainer, 'Social Media Employer Branding', formatCHF(990));
-            }
-            if (isGiftCardAddon) {
-                appendSummaryRow(summaryContainer, 'Custom Employee Gift Card Design', formatCHF(290));
-            }
-
-            // 6. Subtotal & Grand Total Calculations
-            const subtotal = packagePrice + addonsTotal;
-            const vatAmount = subtotal * VAT_RATE;
-            const grandTotal = subtotal + vatAmount;
-
-            document.getElementById('subtotal-display').textContent = formatCHF(subtotal);
-            document.getElementById('vat-display').textContent = formatCHF(vatAmount);
-            document.getElementById('total-display').textContent = formatCHF(grandTotal);
-        }
-
-        // Helper to Append Summary Item Row
-        function appendSummaryRow(container, title, value) {
-            const row = document.createElement('div');
-            row.className = 'flex justify-between items-center text-slate-800 font-medium';
-            row.innerHTML = `
-                <span>${title}</span>
-                <span class="whitespace-nowrap ml-2">${value}</span>
-            `;
-            container.appendChild(row);
-        }
-
-        // Contact Modal Functions
-        function openContactModal() {
-            const modal = document.getElementById('contact-modal');
-            const box = document.getElementById('modal-box');
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            box.classList.remove('scale-95');
-            box.classList.add('scale-100');
-        }
-
-        function closeContactModal() {
-            const modal = document.getElementById('contact-modal');
-            const box = document.getElementById('modal-box');
-            box.classList.remove('scale-100');
-            box.classList.add('scale-95');
-            modal.classList.add('opacity-0', 'pointer-events-none');
-        }
-
-        // Form Submit Handler
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            const alertBox = document.getElementById('form-alert');
-            
-            alertBox.className = "p-3 rounded-lg text-xs font-medium bg-green-50 text-green-700 border border-green-200 block";
-            alertBox.textContent = "Thank you! Your inquiry and customized quote have been submitted successfully.";
-
-            setTimeout(() => {
-                closeContactModal();
-                alertBox.classList.add('hidden');
-            }, 2500);
-        }
-
-        // Initialize Calculation on Page Load
-        window.onload = function() {
-            calculateTotal();
-        };
-    </script>
+    window.onload = init;
+  </script>
 </body>
 </html>
